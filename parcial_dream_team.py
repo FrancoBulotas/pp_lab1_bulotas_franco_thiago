@@ -66,9 +66,9 @@ def guardar_estadisticas_csv(lista_de_jugadores_original:list, indice:int):
             
 
 # 4
-def mostrar_logros_jugador(lista_de_jugadores_original:list, indice_jugador:int) -> list:
+def listar_logros_jugador(lista_de_jugadores_original:list, indice_jugador:int) -> list:
     """
-    - Muestra los logros de un jugador especificado por nombre.
+    - Devuelve la lista de los logros de un jugador especificado por indice.
     - Recibe la lista de jugadores y un int con el indice de uno de ellos.
     - Retorna la lista de logros de dicho jugador.
     """
@@ -76,27 +76,100 @@ def mostrar_logros_jugador(lista_de_jugadores_original:list, indice_jugador:int)
 
     return lista_de_jugadores[indice_jugador]["logros"]
 
-def validacion_nombre_e_imprime_logros(nombre_jugador:str) -> list:
+def validacion_nombre(lista_de_jugadores_original:list, nombre_jugador:str) -> list:
     """
-    - Valida si el nombre del jugador ingresado existe, si existe imprime sus logros
-    - Recibe el nombre del jugador ingresado
-    - No retorna nada
+    - Valida si el nombre del jugador ingresado existe, si existe imprime sus logros.
+    - Recibe el nombre del jugador ingresado y la lista de jugadores.
+    - Retorna la lista de indices del/los jugadores elegidos.
     """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
     lista_indice_nombres_elegidos = []
-    for jugador in lista_jugadores:
+    for jugador in lista_de_jugadores:
         coincidencia_nombre_jugador = re.match("{}+".format(nombre_jugador.lower()), jugador["nombre"].lower())
         if coincidencia_nombre_jugador:
-            lista_indice_nombres_elegidos.append(lista_jugadores.index(jugador))
+            lista_indice_nombres_elegidos.append(lista_de_jugadores.index(jugador))
     
     if len(lista_indice_nombres_elegidos) > 0:
-        for indice_jugador in lista_indice_nombres_elegidos:
-            lista_logros_del_jugador = mostrar_logros_jugador(lista_jugadores, indice_jugador)
-            print("Logros de {}:".format(lista_jugadores[indice_jugador]["nombre"]))
-            for logro in lista_logros_del_jugador:
-                print("{}".format(logro))
+        return lista_indice_nombres_elegidos
     else:
         nombre_jugador = input("Nombre inexistente. Ingrese el nombre del jugador cuyos logros quiere ver\n")
-        validacion_nombre_e_imprime_logros(nombre_jugador)
+        validacion_nombre(lista_de_jugadores, nombre_jugador)
+
+
+def imprimir_logros_jugador(lista_de_jugadores_original:list, lista_indice_nombres_elegidos:list, salon_de_la_fama:bool=False):
+    """
+    - Imprime los logros de los jugadores por nombre dado, o indica si estan en el salon de la fama
+    - Recibe la lista de jugadores, la lista de indices de nombres elegidos y un bool indicando si se quiere saber si ingreso al salon de la fama o no.
+    - No retorna nada
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    for indice_jugador in lista_indice_nombres_elegidos:
+        lista_logros_del_jugador = listar_logros_jugador(lista_de_jugadores, indice_jugador)
+        
+        if salon_de_la_fama == False:
+            print("Logros de {}:".format(lista_de_jugadores[indice_jugador]["nombre"]))
+
+            for logro in lista_logros_del_jugador:
+                print("{}".format(logro))
+        else:
+            if "Miembro del Salon de la Fama del Baloncesto" in lista_logros_del_jugador:
+                print("{} es miembro del salon de la fama".format(lista_de_jugadores[indice_jugador]["nombre"]))
+
+
+# 5
+def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str) -> int: 
+    """
+    - Se encarga de hallar el promedio del equipo de la llave dada.
+    - Recibe una lista de jugadores y una llave del dict estadisticas.
+    - Retorna el promedio (int)
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+    acumulador = 0
+    contador = 0
+
+    for jugador in lista_de_jugadores:
+        if type(jugador["estadisticas"][llave]) == type(int()) or type(jugador["estadisticas"][llave]) == type(float()):
+            acumulador += jugador["estadisticas"][llave]
+            contador += 1
+
+    return acumulador / contador
+
+
+def quicksort(lista_de_jugadores_original:list, flag_asc:bool, key:str)-> list:
+    """
+    - Se encarga de ordenar de manera ascendente o descendente los elementos dados. 
+    - Recibe una lista de jugadores, una flag indicando si es asc o desc y una key del dict de la lista.
+    - Retorna la lista ordenada.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+    mayores_pivot = []
+    menores_pivot = []
+
+    if len(lista_de_jugadores) <= 1:
+        return lista_de_jugadores
+    else:
+        pivot = lista_de_jugadores[0]
+        for jugador in lista_de_jugadores[1:]:
+            if flag_asc == True:
+                if jugador[key] > pivot[key]:
+                    mayores_pivot.append(jugador)
+                else:
+                    menores_pivot.append(jugador)
+            elif flag_asc == False:
+                if jugador[key] < pivot[key]:
+                    mayores_pivot.append(jugador)
+                else:
+                    menores_pivot.append(jugador)
+
+    menores_pivot = quicksort(menores_pivot, flag_asc, key)
+    menores_pivot.append(pivot)
+
+    mayores_pivot = quicksort(mayores_pivot, flag_asc, key)
+    menores_pivot.extend(mayores_pivot)
+
+    return menores_pivot
 
 
 
@@ -115,8 +188,8 @@ def correr_programa():
         print("2. Ingresar un indice para ver estadisticas completas de ese jugador.")
         print("3. Guardar archivo con estadistias completas del jugador elegido en el punto 2.")
         print("4. Buscar un jugador por nombre para ver sus logros.")
-        print("5. ")
-        print("6. ")
+        print("5. Ver el promedio de puntos por partido de todo el equipo del Dream Team, ordenado por nombre de manera ascendente.")
+        print("6. Ingresar nombre para ver si ese jugador es miembro del Salón de la Fama del Baloncesto")
         print("7. ")
         print("8. ")
         print("9. ")
@@ -136,13 +209,13 @@ def correr_programa():
         
         opcion = int(input("\nIngrese la opcion deseada\n"))
         # CORREGIR ESTA VALIDACION
-        while opcion < 0 and opcion > 23:
+        while opcion < 0 or (opcion > 20 and opcion < 23) or opcion > 23 or opcion == "":
             opcion = int(input("\nOpcion invalida. Ingrese la opcion deseada\n"))
 
         if opcion == 1: 
             mostrar_jugadores(lista_jugadores)
 
-        elif opcion == 2:
+        elif opcion == 2: # EMPROLIJAR ESTE ELIF (METER EN FUNCIONES DE SER POSIBLE)
             indice_elegido = input("Ingrese un indice para elegir un jugador de la lista y ver sus estadisticas (1 - 12)\n")
             coincidencia_indice = re.match(r"[0-9]{1,2}", indice_elegido)
 
@@ -173,13 +246,25 @@ def correr_programa():
         elif opcion == 4:
             nombre_jugador = input("Ingrese el nombre del jugador cuyos logros quiere ver\n")
 
-            validacion_nombre_e_imprime_logros(nombre_jugador)
+            lista_indice_nombres_elegidos_4 = validacion_nombre(lista_jugadores, nombre_jugador) #MIRAR FUNCION DE VALIDAR NOMBRE
+
+            print(lista_indice_nombres_elegidos_4)
+
+            imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos_4)
 
         elif opcion == 5:
-            pass
+            print("El promedio de puntos por partido de todo el Dream Team junto es: {} puntos".format(promedio_equipo_por_llave(lista_jugadores, "promedio_puntos_por_partido")))
+            print("Los jugadores ordenados alfabeticamente de forma ascendente, indicando su promedio puntos por partido")
+
+            for jugador in quicksort(lista_jugadores, flag_asc=True, key="nombre"):
+                print("- {} - {}".format(jugador["nombre"], jugador["estadisticas"]["promedio_puntos_por_partido"]))
 
         elif opcion == 6:
-            pass
+            nombre_jugador = input("Ingrese el nombre del jugador\n")
+
+            lista_indice_nombres_elegidos_6 = validacion_nombre(lista_jugadores, nombre_jugador)
+
+            imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos_6, salon_de_la_fama=True)
 
         elif opcion == 7:
             pass
@@ -233,3 +318,31 @@ def correr_programa():
 
 
 correr_programa()
+
+
+
+
+# def validacion_nombre_e_imprime_logros(nombre_jugador:str) -> list:
+#     """
+#     - Valida si el nombre del jugador ingresado existe, si existe imprime sus logros
+#     - Recibe el nombre del jugador ingresado
+#     - No retorna nada
+#     """
+#     lista_indice_nombres_elegidos = []
+#     for jugador in lista_jugadores:
+#         coincidencia_nombre_jugador = re.match("{}+".format(nombre_jugador.lower()), jugador["nombre"].lower())
+#         if coincidencia_nombre_jugador:
+#             lista_indice_nombres_elegidos.append(lista_jugadores.index(jugador))
+    
+#     if len(lista_indice_nombres_elegidos) > 0:
+#         for indice_jugador in lista_indice_nombres_elegidos:
+#             lista_logros_del_jugador = listar_logros_jugador(lista_jugadores, indice_jugador)
+#             print("Logros de {}:".format(lista_jugadores[indice_jugador]["nombre"]))
+#             for logro in lista_logros_del_jugador:
+#                 print("{}".format(logro))
+#     else:
+#         nombre_jugador = input("Nombre inexistente. Ingrese el nombre del jugador cuyos logros quiere ver\n")
+#         validacion_nombre_e_imprime_logros(nombre_jugador)
+
+
+# validacion_nombre_e_imprime_logros("mifasd")
