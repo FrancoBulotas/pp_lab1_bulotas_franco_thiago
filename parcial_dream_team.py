@@ -19,6 +19,7 @@ def leer_archivo(nombre_archivo:str):
 
 lista_jugadores = leer_archivo("dream_team.json")
 
+# 1
 def mostrar_jugadores(lista_de_jugadores_original:list):
     """
     - Muestra la lista de jugadores del Dream Team
@@ -32,7 +33,7 @@ def mostrar_jugadores(lista_de_jugadores_original:list):
         print("{} - {} - {}".format(cont, jugador["nombre"], jugador["posicion"]))
         cont += 1   
     
-
+# 2
 def estadisticas_completas_jugador(lista_de_jugadores_original:list, indice:int) -> dict:
     """
     - Muestra las estadisticas completas de un jugador dado.
@@ -43,7 +44,7 @@ def estadisticas_completas_jugador(lista_de_jugadores_original:list, indice:int)
 
     return lista_de_jugadores[indice]["estadisticas"] 
 
-
+# 3
 def guardar_estadisticas_csv(lista_de_jugadores_original:list, indice:int):
     """
     - Guarda en un CSV las estadisticas del jugador seleccionado en el punto 2.
@@ -64,6 +65,41 @@ def guardar_estadisticas_csv(lista_de_jugadores_original:list, indice:int):
             archivo.write("{},".format(lista_de_jugadores[indice]["estadisticas"][estadistica]))  
             
 
+# 4
+def mostrar_logros_jugador(lista_de_jugadores_original:list, indice_jugador:int) -> list:
+    """
+    - Muestra los logros de un jugador especificado por nombre.
+    - Recibe la lista de jugadores y un int con el indice de uno de ellos.
+    - Retorna la lista de logros de dicho jugador.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    return lista_de_jugadores[indice_jugador]["logros"]
+
+def validacion_nombre_e_imprime_logros(nombre_jugador:str) -> list:
+    """
+    - Valida si el nombre del jugador ingresado existe, si existe imprime sus logros
+    - Recibe el nombre del jugador ingresado
+    - No retorna nada
+    """
+    lista_indice_nombres_elegidos = []
+    for jugador in lista_jugadores:
+        coincidencia_nombre_jugador = re.match("{}+".format(nombre_jugador.lower()), jugador["nombre"].lower())
+        if coincidencia_nombre_jugador:
+            lista_indice_nombres_elegidos.append(lista_jugadores.index(jugador))
+    
+    if len(lista_indice_nombres_elegidos) > 0:
+        for indice_jugador in lista_indice_nombres_elegidos:
+            lista_logros_del_jugador = mostrar_logros_jugador(lista_jugadores, indice_jugador)
+            print("Logros de {}:".format(lista_jugadores[indice_jugador]["nombre"]))
+            for logro in lista_logros_del_jugador:
+                print("{}".format(logro))
+    else:
+        nombre_jugador = input("Nombre inexistente. Ingrese el nombre del jugador cuyos logros quiere ver\n")
+        validacion_nombre_e_imprime_logros(nombre_jugador)
+
+
+
 def correr_programa():
     """
     - Se encarga de correr el programa principal
@@ -75,10 +111,10 @@ def correr_programa():
 
     while True:
         print("Menú de opciones:")
-        print("1. Mostrar la lista de todos los jugadores del Dream Team")
-        print("2. Ingresar un indice para ver estadisticas completas de ese jugador")
+        print("1. Mostrar la lista de todos los jugadores del Dream Team.")
+        print("2. Ingresar un indice para ver estadisticas completas de ese jugador.")
         print("3. Guardar archivo con estadistias completas del jugador elegido en el punto 2.")
-        print("4. ")
+        print("4. Buscar un jugador por nombre para ver sus logros.")
         print("5. ")
         print("6. ")
         print("7. ")
@@ -132,10 +168,12 @@ def correr_programa():
             if flag_segundo_punto == True:
                 guardar_estadisticas_csv(lista_jugadores, indice_elegido)
             else:
-                print("No podes guardar un archivo con las estadisticas de un jugador, ya que no elegiste uno. Debes pasar por el punto 2.")
+                print("No podes guardar un archivo con las estadisticas de un jugador, ya que no elegiste uno. Debes pasar por el punto 2\n")
 
         elif opcion == 4:
-            pass
+            nombre_jugador = input("Ingrese el nombre del jugador cuyos logros quiere ver\n")
+
+            validacion_nombre_e_imprime_logros(nombre_jugador)
 
         elif opcion == 5:
             pass
