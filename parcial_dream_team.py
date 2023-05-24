@@ -50,22 +50,19 @@ def guardar_estadisticas_csv(lista_de_jugadores_original:list, indice:int):
     - Recibe la lista de jugadores y el indice elegido anteriormente.
     - No retorna nada.
     """
-    ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Programacion I\\Ejercicios\\Archivos Stark\\"
+    ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\Archivos Dream Team\\"
 
     lista_de_jugadores = lista_de_jugadores_original[:]
 
-    with open(ruta + lista_de_jugadores[indice]["nombre"], "w") as archivo:
-        if type(contenido_a_guardar) == list:
-            for elemento in contenido_a_guardar:         
-                if len(llave) > 0:
-                    mensaje = "{},{} \n".format(elemento["nombre"],
-                                                elemento[llave])
-                    archivo.write(mensaje)  
-                else:
-                    mensaje = "{} \n".format(elemento)
-                    archivo.write(mensaje)  
+    with open(ruta + lista_de_jugadores[indice]["nombre"] + ".csv", "w") as archivo:
+        for estadistica in lista_de_jugadores[indice]["estadisticas"]:         
+            archivo.write("{},".format(estadistica))
 
+        archivo.write("\n")  
 
+        for estadistica in lista_de_jugadores[indice]["estadisticas"]: 
+            archivo.write("{},".format(lista_de_jugadores[indice]["estadisticas"][estadistica]))  
+            
 
 def correr_programa():
     """
@@ -133,6 +130,8 @@ def correr_programa():
 
         elif opcion == 3 and flag_segundo_punto == True:
             
+
+            guardar_estadisticas_csv(lista_jugadores, indice_elegido)
 
 
         elif opcion == 4:
