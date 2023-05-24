@@ -77,7 +77,7 @@ def correr_programa():
         print("Menú de opciones:")
         print("1. Mostrar la lista de todos los jugadores del Dream Team")
         print("2. Ingresar un indice para ver estadisticas completas de ese jugador")
-        print("3. ")
+        print("3. Guardar archivo con estadistias completas del jugador elegido en el punto 2.")
         print("4. ")
         print("5. ")
         print("6. ")
@@ -99,18 +99,18 @@ def correr_programa():
         print("0. Salir del programa")
         
         opcion = int(input("\nIngrese la opcion deseada\n"))
-
+        # CORREGIR ESTA VALIDACION
         while opcion < 0 and opcion > 23:
             opcion = int(input("\nOpcion invalida. Ingrese la opcion deseada\n"))
 
-        if opcion == 1:
+        if opcion == 1: 
             mostrar_jugadores(lista_jugadores)
 
         elif opcion == 2:
             indice_elegido = input("Ingrese un indice para elegir un jugador de la lista y ver sus estadisticas (1 - 12)\n")
             coincidencia_indice = re.match(r"[0-9]{1,2}", indice_elegido)
 
-            while not coincidencia_indice:
+            while coincidencia_indice == None:
                 indice_elegido = input("Indice invalido. Ingrese un indice para elegir un jugador de la lista y ver sus estadisticas (1 - 12)\n")
                 coincidencia_indice = re.match(r"[0-9]{1,2}", indice_elegido)
                 
@@ -128,11 +128,11 @@ def correr_programa():
 
             flag_segundo_punto = True
 
-        elif opcion == 3 and flag_segundo_punto == True:
-            
-
-            guardar_estadisticas_csv(lista_jugadores, indice_elegido)
-
+        elif opcion == 3:
+            if flag_segundo_punto == True:
+                guardar_estadisticas_csv(lista_jugadores, indice_elegido)
+            else:
+                print("No podes guardar un archivo con las estadisticas de un jugador, ya que no elegiste uno. Debes pasar por el punto 2.")
 
         elif opcion == 4:
             pass
