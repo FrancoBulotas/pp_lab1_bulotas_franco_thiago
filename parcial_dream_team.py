@@ -119,7 +119,7 @@ def imprimir_logros_jugador(lista_de_jugadores_original:list, lista_indice_nombr
 
 
 # 5
-def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str) -> int: 
+def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str, excluir_menor=False) -> int: 
     """
     - Se encarga de hallar el promedio del equipo de la llave dada.
     - Recibe una lista de jugadores y una llave del dict estadisticas.
@@ -129,10 +129,15 @@ def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str) -> in
     acumulador = 0
     contador = 0
 
+    if excluir_menor == True:
+        lista_de_jugadores.pop(calcular_min(lista_de_jugadores, llave)) # pop() toma como parametro un indice para luego borrarlo de la lista
+    
     for jugador in lista_de_jugadores:
         if type(jugador["estadisticas"][llave]) == type(int()) or type(jugador["estadisticas"][llave]) == type(float()):
             acumulador += jugador["estadisticas"][llave]
             contador += 1
+
+    
 
     return acumulador / contador
 
@@ -172,6 +177,116 @@ def quicksort(lista_de_jugadores_original:list, flag_asc:bool, key:str)-> list:
     return menores_pivot
 
 
+def calcular_min(lista_de_jugadores_original:list, llave:str) -> int:
+    """
+    - Calcula cual es el minimo de la llave dada.
+    - Recibe la lista de heroes y una llave del dict.
+    - Retorna el indice del minimo.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    for indice in range(len(lista_de_jugadores)):
+        if indice == 0 or float(lista_de_jugadores[minimo_indice]["estadisticas"][llave]) > float(lista_de_jugadores[indice]["estadisticas"][llave]):
+            minimo_indice = indice
+
+    return minimo_indice
+
+
+# 6, 7, 8
+def calcular_max(lista_de_jugadores_original:list, llave:str) -> str:
+    """
+    - Calcula cual es el maximo de la llave dada.
+    - Recibe la lista de heroes y una llave del dict.
+    - Retorna el nombre del maximo.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    for indice in range(len(lista_de_jugadores)):
+        if indice == 0 or float(lista_de_jugadores[maximo_indice]["estadisticas"][llave]) < float(lista_de_jugadores[indice]["estadisticas"][llave]):
+            maximo_indice = indice
+
+    return "{} - {}".format(lista_de_jugadores[maximo_indice]["nombre"], lista_de_jugadores[maximo_indice]["estadisticas"][llave])
+    
+# 10, 11, 12
+def mayor_al_valor_ingresado(lista_de_jugadores_original:list, llave:str, valor_ingresado:int) -> list:
+    """
+    - Busca en la lista dada, si el valor ingresado es mayor o menor a la llave dada.
+    - Recibe una lista de jugadores, una llave del dict 'estadisticas' y un valor ingresado(int).
+    - Retorna una lista con los indices de los jugadores mayores al valor ingresado.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+    indices_mayores_pivot = []
+
+    pivot = valor_ingresado
+    for jugador in lista_de_jugadores:
+        if jugador["estadisticas"][llave] > pivot:
+            indices_mayores_pivot.append(lista_de_jugadores.index(jugador))
+
+    return indices_mayores_pivot
+
+def validar_numero(dato:str):
+    """
+    - Valida si el dato pasado es numerico, y si lo es lo convierte a int o a float.
+    - Recibe un str. 
+    - Retorna un int en caso de ser numerico, si no lo es retorna False.
+    """
+    # CHEQUEAR ESTE PATRON (VALIDA MAL EL PUNTO)
+    patron = r"[0-9]+\.?[0-9]*" # El punto escapado con ? es para que permita un punto o ninguno 
+    if re.match(patron, dato):
+        try:    
+            return int(dato)
+        except Exception as error:
+            return float(dato)
+    else: 
+        return False
+    
+
+def validar_valor_ingresado(valor_ingresado):
+    """
+    - 
+    -
+    -
+    """
+    valor_ingresado = validar_numero(valor_ingresado)
+
+    while valor_ingresado == False:
+        valor_ingresado = input("Valor invalido. Ingrese un valor\n")
+        valor_ingresado = validar_numero(valor_ingresado)
+    
+    return valor_ingresado
+    
+
+def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_indices:list, info:str, flag_posicion:bool=False):
+    """
+    - Imprime los nombres de los jugadores segun la lista de indice/s pasado/s.
+    - Recibe la lista de jugadores, una lista de indices, un str que hace referencia a lo que se calculo anteriormente y 
+      un bool que indica si se toma la posicion en la cancha o no
+    - No retorna nada.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    if len(lista_indices) == 0:
+        print("No hay ningun jugador que promedie mas {}".format(info))
+    else:
+        if "porcentaje" in info and flag_posicion == False:
+            print("Los jugadores con un mayor {} que el valor ingresado son:".format(info))
+            for indice in lista_indices:
+                print("- " + lista_de_jugadores[indice]["nombre"])
+
+        elif flag_posicion == True:
+            print("Los jugadores con un mayor {} que el valor ingresado son:".format(info))
+
+            for indice in range(len(lista_de_jugadores)):
+                lista_ordenada_por_posicion = quicksort(lista_de_jugadores, flag_asc=True, key="posicion")
+
+                print("- {} - {}".format(lista_ordenada_por_posicion[indice]["nombre"],
+                                         lista_ordenada_por_posicion[indice]["posicion"]))
+        else:
+            print("Los jugadores que han promediado mas {} que el valor ingresado son:".format(info))
+            for indice in lista_indices:
+                print("- " + lista_de_jugadores[indice]["nombre"])
+
+
 
 def correr_programa():
     """
@@ -189,21 +304,21 @@ def correr_programa():
         print("3. Guardar archivo con estadistias completas del jugador elegido en el punto 2.")
         print("4. Buscar un jugador por nombre para ver sus logros.")
         print("5. Ver el promedio de puntos por partido de todo el equipo del Dream Team, ordenado por nombre de manera ascendente.")
-        print("6. Ingresar nombre para ver si ese jugador es miembro del Salón de la Fama del Baloncesto")
-        print("7. ")
-        print("8. ")
-        print("9. ")
-        print("10. ")
-        print("11. ")
-        print("12. ")
-        print("13. ")
-        print("14. ")
-        print("15. ")
-        print("16. ")
+        print("6. Ingresar nombre para ver si ese jugador es miembro del Salón de la Fama del Baloncesto.")
+        print("7. Ver el jugador con la mayor cantidad de rebotes totales.")
+        print("8. Ver el jugador con el mayor porcentaje de tiros de campo.")
+        print("9. Ver el jugador con la mayor cantidad de asistencias totales.")
+        print("10. Ingresar un valor y ver los jugadores que han promediado más puntos por partido que ese valor.")
+        print("11. Ingresar un valor y ver los jugadores que han promediado más rebotes por partido que ese valor.")
+        print("12. Ingresar un valor y ver los jugadores que han promediado más asistencias por partido que ese valor.")
+        print("13. Ver el jugador con la mayor cantidad de robos totales.")
+        print("14. Ver el jugador con la mayor cantidad de bloqueos totales.")
+        print("15. Ingresar un valor y ver los jugadores que hayan tenido un porcentaje de tiros libres superior a ese valor.")
+        print("16. Ver el promedio de puntos por partido del equipo excluyendo al jugador con la menor cantidad de puntos por partido.")
         print("17. ")
-        print("18. ")
-        print("19. ")
-        print("20. ")
+        print("18. Ingresar un valor y ver los jugadores que hayan tenido un porcentaje de tiros triples superior a ese valor.")
+        print("19. Ver cual es el jugador con la mayor cantidad de temporadas jugadas")
+        print("20. Ingresar un valor y ver los jugadores, ordenados por posición en la cancha, que tengan un porcentaje de tiros de campo superior a ese valor.")
         print("23. ")
         print("0. Salir del programa")
         
@@ -246,7 +361,7 @@ def correr_programa():
         elif opcion == 4:
             nombre_jugador = input("Ingrese el nombre del jugador cuyos logros quiere ver\n")
 
-            lista_indice_nombres_elegidos_4 = validacion_nombre(lista_jugadores, nombre_jugador) #MIRAR FUNCION DE VALIDAR NOMBRE
+            lista_indice_nombres_elegidos_4 = validacion_nombre(lista_jugadores, nombre_jugador) # MIRAR FUNCION DE VALIDAR NOMBRE
 
             print(lista_indice_nombres_elegidos_4)
 
@@ -267,46 +382,83 @@ def correr_programa():
             imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos_6, salon_de_la_fama=True)
 
         elif opcion == 7:
-            pass
+            print("El jugador con mayor cantidad de rebotes es {} rebotes".format(calcular_max(lista_jugadores, llave="rebotes_totales")))
 
         elif opcion == 8:
-            pass
+            print("El jugador con mayor porcentaje de tiros de campo es {} %".format(calcular_max(lista_jugadores, llave="porcentaje_tiros_de_campo")))
 
         elif opcion == 9:
-            pass
+            print("El jugador con la mayor cantidad de asistencias totales es {} asistencias".format(calcular_max(lista_jugadores, llave="asistencias_totales")))
 
         elif opcion == 10:
-            pass
+            valor_ingresado_10 = input("Ingrese un valor\n")
+        
+            valor_ingresado_10 = validar_valor_ingresado(valor_ingresado_10) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+
+            lista_indices_mayores_ppp = mayor_al_valor_ingresado(lista_jugadores, llave="promedio_puntos_por_partido", valor_ingresado=valor_ingresado_10)
+            
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ppp, "puntos por partido")
 
         elif opcion == 11:
-            pass
+            valor_ingresado_11 = input("Ingrese un valor\n")
+        
+            valor_ingresado_11 = validar_valor_ingresado(valor_ingresado_11) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+
+            lista_indices_mayores_rpp = mayor_al_valor_ingresado(lista_jugadores, llave="promedio_rebotes_por_partido", valor_ingresado=valor_ingresado_11)
+            
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_rpp, "rebotes por partido")
 
         elif opcion == 12:
-            pass
+            valor_ingresado_12 = input("Ingrese un valor\n")
+        
+            valor_ingresado_12 = validar_valor_ingresado(valor_ingresado_12) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+
+            lista_indices_mayores_app = mayor_al_valor_ingresado(lista_jugadores, llave="promedio_asistencias_por_partido", valor_ingresado=valor_ingresado_12)
+            
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_app, "asistencias por partido")
 
         elif opcion == 13:
-            pass
+            print("El jugador con mayor cantidad de robos totales es {} robos".format(calcular_max(lista_jugadores, llave="robos_totales")))
 
         elif opcion == 14:
-            pass
+            print("El jugador con mayor cantidad de bloqueos totales es {} bloqueos".format(calcular_max(lista_jugadores, llave="bloqueos_totales")))
 
         elif opcion == 15:
-            pass
+            valor_ingresado_15 = input("Ingrese un valor\n")
+        
+            valor_ingresado_15 = validar_valor_ingresado(valor_ingresado_15) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+
+            lista_indices_mayores_ptl = mayor_al_valor_ingresado(lista_jugadores, llave="porcentaje_tiros_libres", valor_ingresado=valor_ingresado_15)
+            
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ptl, "porcentaje de tiros libres")
 
         elif opcion == 16:
-            pass
+            print("El promedio de puntos por partido de todo el Dream Team excluyendo al jugador con la menor cantidad de puntos por partido es de {} puntos"
+                  .format(promedio_equipo_por_llave(lista_jugadores, "promedio_puntos_por_partido", excluir_menor=True)))
 
         elif opcion == 17:
-            pass
+            pass # ESTE PENSARLO PARA HACER TRYHARD
 
         elif opcion == 18:
-            pass
+            valor_ingresado_18 = input("Ingrese un valor\n")
+        
+            valor_ingresado_18 = validar_valor_ingresado(valor_ingresado_18) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+
+            lista_indices_mayores_ptt = mayor_al_valor_ingresado(lista_jugadores, llave="porcentaje_tiros_triples", valor_ingresado=valor_ingresado_18)
+            
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ptt, "porcentaje de tiros triples")
 
         elif opcion == 19:
-            pass
+            print("El jugador con mayor cantidad de temporadas jugadas es {} temporadas".format(calcular_max(lista_jugadores, llave="temporadas")))
 
         elif opcion == 20:
-            pass
+            valor_ingresado_20 = input("Ingrese un valor\n")
+        
+            valor_ingresado_20 = validar_valor_ingresado(valor_ingresado_20) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+
+            lista_indices_mayores_ptc = mayor_al_valor_ingresado(lista_jugadores, llave="porcentaje_tiros_de_campo", valor_ingresado=valor_ingresado_20)
+            
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ptc, "porcentaje de tiros de campo", flag_posicion=True)
 
         elif opcion == 23:
             pass
