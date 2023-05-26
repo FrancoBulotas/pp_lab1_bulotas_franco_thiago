@@ -35,7 +35,6 @@ def correr_programa():
         print("23. Ver cuál es la posición de cada jugador en cada uno de los siguientes ranking (Puntos / Rebotes / Asistencias / Robos) y guardar en archivo.")
         print("0. Salir del programa")
         
-        
         opcion = input("\nIngrese la opcion deseada\n")
     
         while validacion_menu(opcion) == False:
@@ -44,17 +43,14 @@ def correr_programa():
         if opcion == "1": 
             mostrar_jugadores(lista_jugadores)
 
-        elif opcion == "2": # EMPROLIJAR ESTE ELIF (METER EN FUNCIONES DE SER POSIBLE)
+        elif opcion == "2": 
             indice_elegido = input("Ingrese un indice para elegir un jugador de la lista y ver sus estadisticas (1 - 12)\n")
-            coincidencia_indice = re.match(r"[0-9]{1,2}", indice_elegido)
-
-            while coincidencia_indice == None:
-                indice_elegido = input("Indice invalido. Ingrese un indice para elegir un jugador de la lista y ver sus estadisticas (1 - 12)\n")
-                coincidencia_indice = re.match(r"[0-9]{1,2}", indice_elegido)
                 
-            indice_elegido = int(indice_elegido)
+            indice_elegido = validar_dato_ingresado(lista_jugadores, indice_elegido)
+
             while indice_elegido < 1 or indice_elegido > 12:
                 indice_elegido = input("Indice invalido. Ingrese un indice para elegir un jugador de la lista y ver sus estadisticas (1 - 12)\n")
+                indice_elegido = validar_dato_ingresado(lista_jugadores, indice_elegido)
 
             indice_elegido -= 1
 
@@ -76,25 +72,27 @@ def correr_programa():
         elif opcion == "4":
             nombre_jugador = input("Ingrese el nombre del jugador cuyos logros quiere ver\n")
 
-            lista_indice_nombres_elegidos_4 = validacion_nombre(lista_jugadores, nombre_jugador) # MIRAR FUNCION DE VALIDAR NOMBRE
+            lista_indice_nombres_elegidos = validacion_nombre(lista_jugadores, nombre_jugador) # MIRAR FUNCION DE VALIDAR NOMBRE
 
-            print(lista_indice_nombres_elegidos_4)
+            lista_indice_nombres_elegidos = validar_dato_ingresado(lista_jugadores, lista_indice_nombres_elegidos)
 
-            imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos_4)
+            imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos)
 
         elif opcion == "5":
             print("El promedio de puntos por partido de todo el Dream Team junto es: {} puntos".format(promedio_equipo_por_llave(lista_jugadores, "promedio_puntos_por_partido")))
             print("Los jugadores ordenados alfabeticamente de forma ascendente, indicando su promedio puntos por partido")
 
-            for jugador in quicksort(lista_jugadores, flag_asc=True, key="nombre"):
+            for jugador in quicksort(lista_jugadores, flag_asc=True, llave="nombre"):
                 print("- {} - {}".format(jugador["nombre"], jugador["estadisticas"]["promedio_puntos_por_partido"]))
 
         elif opcion == "6":
             nombre_jugador = input("Ingrese el nombre del jugador\n")
 
-            lista_indice_nombres_elegidos_6 = (lista_jugadores, nombre_jugador)
+            lista_indice_nombres_elegidos = validacion_nombre(lista_jugadores, nombre_jugador)
 
-            imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos_6, salon_de_la_fama=True)
+            lista_indice_nombres_elegidos = validar_dato_ingresado(lista_jugadores, lista_indice_nombres_elegidos)
+
+            imprimir_logros_jugador(lista_jugadores, lista_indice_nombres_elegidos, salon_de_la_fama=True)
 
         elif opcion == "7":
             print("El jugador con mayor cantidad de rebotes es {} rebotes".format(calcular_max(lista_jugadores, llave="rebotes_totales")))
@@ -106,31 +104,19 @@ def correr_programa():
             print("El jugador con la mayor cantidad de asistencias totales es {} asistencias".format(calcular_max(lista_jugadores, llave="asistencias_totales")))
 
         elif opcion == "10":
-            valor_ingresado_10 = input("Ingrese un valor\n")
-        
-            valor_ingresado_10 = validar_valor_ingresado(valor_ingresado_10) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="promedio_puntos_por_partido")
 
-            lista_indices_mayores_ppp = mayor_al_valor_ingresado(lista_jugadores, llave="promedio_puntos_por_partido", valor_ingresado=valor_ingresado_10)
-            
-            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ppp, "puntos por partido")
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="puntos por partido")
 
         elif opcion == "11":
-            valor_ingresado_11 = input("Ingrese un valor\n")
-        
-            valor_ingresado_11 = validar_valor_ingresado(valor_ingresado_11) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
-
-            lista_indices_mayores_rpp = mayor_al_valor_ingresado(lista_jugadores, llave="promedio_rebotes_por_partido", valor_ingresado=valor_ingresado_11)
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="promedio_rebotes_por_partido")
             
-            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_rpp, "rebotes por partido")
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="rebotes por partido")
 
         elif opcion == "12":
-            valor_ingresado_12 = input("Ingrese un valor\n")
-        
-            valor_ingresado_12 = validar_valor_ingresado(valor_ingresado_12) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="promedio_asistencias_por_partido")
 
-            lista_indices_mayores_app = mayor_al_valor_ingresado(lista_jugadores, llave="promedio_asistencias_por_partido", valor_ingresado=valor_ingresado_12)
-            
-            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_app, "asistencias por partido")
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="asistencias por partido")
 
         elif opcion == "13":
             print("El jugador con mayor cantidad de robos totales es {} robos".format(calcular_max(lista_jugadores, llave="robos_totales")))
@@ -139,13 +125,9 @@ def correr_programa():
             print("El jugador con mayor cantidad de bloqueos totales es {} bloqueos".format(calcular_max(lista_jugadores, llave="bloqueos_totales")))
 
         elif opcion == "15":
-            valor_ingresado_15 = input("Ingrese un valor\n")
-        
-            valor_ingresado_15 = validar_valor_ingresado(valor_ingresado_15) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
-
-            lista_indices_mayores_ptl = mayor_al_valor_ingresado(lista_jugadores, llave="porcentaje_tiros_libres", valor_ingresado=valor_ingresado_15)
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="porcentaje_tiros_libres")
             
-            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ptl, "porcentaje de tiros libres")
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="porcentaje de tiros libres")
 
         elif opcion == "16":
             print("El promedio de puntos por partido de todo el Dream Team excluyendo al jugador con la menor cantidad de puntos por partido es de {} puntos"
@@ -159,25 +141,17 @@ def correr_programa():
                 print(logro)
 
         elif opcion == "18":
-            valor_ingresado_18 = input("Ingrese un valor\n")
-        
-            valor_ingresado_18 = validar_valor_ingresado(valor_ingresado_18) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
-
-            lista_indices_mayores_ptt = mayor_al_valor_ingresado(lista_jugadores, llave="porcentaje_tiros_triples", valor_ingresado=valor_ingresado_18)
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="porcentaje_tiros_triples")
             
-            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ptt, "porcentaje de tiros triples")
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="porcentaje de tiros triples")
 
         elif opcion == "19":
             print("El jugador con mayor cantidad de temporadas jugadas es {} temporadas".format(calcular_max(lista_jugadores, llave="temporadas")))
 
         elif opcion == "20":
-            valor_ingresado_20 = input("Ingrese un valor\n")
-        
-            valor_ingresado_20 = validar_valor_ingresado(valor_ingresado_20) # TEMPORAL HASTA QUE VEA COMO SOLUCIONAR RECURSIVIDAD DE LA FUNCION VALIDAR_NOMBRE
-
-            lista_indices_mayores_ptc = mayor_al_valor_ingresado(lista_jugadores, llave="porcentaje_tiros_de_campo", valor_ingresado=valor_ingresado_20)
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="porcentaje_tiros_de_campo")
             
-            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores_ptc, "porcentaje de tiros de campo", flag_posicion=True)
+            imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="porcentaje de tiros de campo", flag_posicion=True)
 
         elif opcion == "23":
             guardar_ranking_en_csv(lista_jugadores)
@@ -191,31 +165,3 @@ def correr_programa():
 
 
 correr_programa()
-
-
-
-
-# def validacion_nombre_e_imprime_logros(nombre_jugador:str) -> list:
-#     """
-#     - Valida si el nombre del jugador ingresado existe, si existe imprime sus logros
-#     - Recibe el nombre del jugador ingresado
-#     - No retorna nada
-#     """
-#     lista_indice_nombres_elegidos = []
-#     for jugador in lista_jugadores:
-#         coincidencia_nombre_jugador = re.match("{}+".format(nombre_jugador.lower()), jugador["nombre"].lower())
-#         if coincidencia_nombre_jugador:
-#             lista_indice_nombres_elegidos.append(lista_jugadores.index(jugador))
-    
-#     if len(lista_indice_nombres_elegidos) > 0:
-#         for indice_jugador in lista_indice_nombres_elegidos:
-#             lista_logros_del_jugador = listar_logros_jugador(lista_jugadores, indice_jugador)
-#             print("Logros de {}:".format(lista_jugadores[indice_jugador]["nombre"]))
-#             for logro in lista_logros_del_jugador:
-#                 print("{}".format(logro))
-#     else:
-#         nombre_jugador = input("Nombre inexistente. Ingrese el nombre del jugador cuyos logros quiere ver\n")
-#         validacion_nombre_e_imprime_logros(nombre_jugador)
-
-
-# validacion_nombre_e_imprime_logros("mifasd")

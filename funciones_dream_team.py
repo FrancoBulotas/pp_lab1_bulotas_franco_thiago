@@ -31,6 +31,79 @@ def validacion_menu(numero:int) -> bool:
         return True
     else:
         return False
+    
+
+def validar_numero(dato:str):
+    """
+    - Valida si el dato pasado es numerico, y si lo es lo convierte a int o a float.
+    - Recibe un str. 
+    - Retorna un int o float en caso de ser numerico, si no lo es retorna False.
+    """
+    if re.match( r"^\d+(\.\d+)?$", dato):
+        try:    
+            return int(dato)
+        except Exception as error:
+            return float(dato)
+    else: 
+        return False
+
+
+def validacion_nombre(lista_de_jugadores_original:list, nombre_jugador:str) -> list:
+    """
+    - Valida si el nombre del jugador ingresado existe.
+    - Recibe el nombre del jugador ingresado y la lista de jugadores.
+    - Retorna la lista de indices del/los jugadores elegidos o False si no existe.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    lista_indice_nombres_elegidos = []
+    for jugador in lista_de_jugadores:
+        coincidencia_nombre_jugador = re.match("{}+".format(nombre_jugador.lower()), jugador["nombre"].lower())
+        if coincidencia_nombre_jugador:
+            lista_indice_nombres_elegidos.append(lista_de_jugadores.index(jugador))
+    
+    if len(lista_indice_nombres_elegidos) > 0:
+        return lista_indice_nombres_elegidos
+    else:
+        return False
+    
+
+def validar_dato_ingresado(lista_de_jugadores_original:list, valor_ingresado):
+    """
+    - Valida si el valor ingresado no sea incorrecto, si lo es, pregunta para ingresar otro.
+    - Recibe la lista de jugadores y un valor.
+    - Retorna ese valor.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    if type(valor_ingresado) == type(int()) or type(valor_ingresado) == type(float()) or type(valor_ingresado) == type(str()):
+        valor_ingresado = validar_numero(valor_ingresado)
+
+        while valor_ingresado == False:
+            valor_ingresado = input("Valor invalido. Ingrese otro valor\n")
+            valor_ingresado = validar_numero(valor_ingresado)
+    
+    elif type(valor_ingresado) == type(bool()):
+        while valor_ingresado == False:
+            valor_ingresado = input("Nombre inexistente. Ingrese el nombre del jugador cuyos logros quiere ver\n")
+            valor_ingresado = validacion_nombre(lista_de_jugadores, nombre_jugador = valor_ingresado)
+    
+    return valor_ingresado
+
+def ingresar_y_validar_valor(lista_de_jugadores_original:list, llave:str):
+    """
+    - Valida el valor ingresado e imprime los nombres que cumplan lo dado.
+    - Recibe la lista de jugadores y una llave(str).
+    - Retorna la lista de los mayores al valor dado.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    valor_ingresado = input("Ingrese un valor\n")
+
+    valor_ingresado = validar_dato_ingresado(lista_de_jugadores, valor_ingresado) 
+
+    return mayor_al_valor_ingresado(lista_de_jugadores, llave, valor_ingresado)
+
 
 # 1
 def mostrar_jugadores(lista_de_jugadores_original:list):
@@ -77,7 +150,6 @@ def guardar_estadisticas_csv(lista_de_jugadores_original:list, indice:int):
         for estadistica in lista_de_jugadores[indice]["estadisticas"]: 
             archivo.write("{},".format(lista_de_jugadores[indice]["estadisticas"][estadistica]))  
             
-
 # 4
 def listar_logros_jugador(lista_de_jugadores_original:list, indice_jugador:int) -> list:
     """
@@ -88,31 +160,11 @@ def listar_logros_jugador(lista_de_jugadores_original:list, indice_jugador:int) 
     lista_de_jugadores = lista_de_jugadores_original[:]
 
     return lista_de_jugadores[indice_jugador]["logros"]
-
-def validacion_nombre(lista_de_jugadores_original:list, nombre_jugador:str) -> list:
-    """
-    - Valida si el nombre del jugador ingresado existe, si existe imprime sus logros.
-    - Recibe el nombre del jugador ingresado y la lista de jugadores.
-    - Retorna la lista de indices del/los jugadores elegidos.
-    """
-    lista_de_jugadores = lista_de_jugadores_original[:]
-
-    lista_indice_nombres_elegidos = []
-    for jugador in lista_de_jugadores:
-        coincidencia_nombre_jugador = re.match("{}+".format(nombre_jugador.lower()), jugador["nombre"].lower())
-        if coincidencia_nombre_jugador:
-            lista_indice_nombres_elegidos.append(lista_de_jugadores.index(jugador))
     
-    if len(lista_indice_nombres_elegidos) > 0:
-        return lista_indice_nombres_elegidos
-    else:
-        nombre_jugador = input("Nombre inexistente. Ingrese el nombre del jugador cuyos logros quiere ver\n")
-        validacion_nombre(lista_de_jugadores, nombre_jugador)
-
 
 def imprimir_logros_jugador(lista_de_jugadores_original:list, lista_indice_nombres_elegidos:list, salon_de_la_fama:bool=False):
     """
-    - Imprime los logros de los jugadores por nombre dado, o indica si estan en el salon de la fama
+    - Imprime los logros de los jugadores por nombre dado, o indica si estan en el salon de la fama.
     - Recibe la lista de jugadores, la lista de indices de nombres elegidos y un bool indicando si se quiere saber si ingreso al salon de la fama o no.
     - No retorna nada
     """
@@ -155,10 +207,11 @@ def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str, exclu
     return acumulador / contador
 
 
-def quicksort(lista_de_jugadores_original:list, flag_asc:bool, key:str, key_estadisticas:str = None) -> list:
+def quicksort(lista_de_jugadores_original:list, flag_asc:bool, llave:str, llave_estadisticas:str = None) -> list:
     """
     - Se encarga de ordenar de manera ascendente o descendente los elementos dados. 
-    - Recibe una lista de jugadores, una flag indicando si es asc o desc y una key del dict de la lista.
+    - Recibe una lista de jugadores, una flag indicando si es asc o desc, una llave del dict de la lista y 
+      una llave del dict 'estadisticas' en caso de ser necesaria.
     - Retorna la lista ordenada.
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
@@ -171,32 +224,32 @@ def quicksort(lista_de_jugadores_original:list, flag_asc:bool, key:str, key_esta
         pivot = lista_de_jugadores[0]
         for jugador in lista_de_jugadores[1:]:
             if flag_asc == True:
-                if key.lower() == "estadisticas":
-                    if jugador[key][key_estadisticas] > pivot[key][key_estadisticas]:
+                if llave.lower() == "estadisticas":  # Esta modificacion esta hecha para el 23
+                    if jugador[llave][llave_estadisticas] > pivot[llave][llave_estadisticas]:
                         mayores_pivot.append(jugador)
                     else:
                         menores_pivot.append(jugador)
                 else: 
-                    if jugador[key] > pivot[key]:
+                    if jugador[llave] > pivot[llave]:
                         mayores_pivot.append(jugador)
                     else:
                         menores_pivot.append(jugador)
             elif flag_asc == False:
-                if key.lower() == "estadisticas":
-                    if jugador[key][key_estadisticas] < pivot[key][key_estadisticas]:
+                if llave.lower() == "estadisticas":  # Esta modificacion esta hecha para el 23
+                    if jugador[llave][llave_estadisticas] < pivot[llave][llave_estadisticas]:
                         mayores_pivot.append(jugador)
                     else:
                         menores_pivot.append(jugador)
                 else: 
-                    if jugador[key] < pivot[key]:
+                    if jugador[llave] < pivot[llave]:
                         mayores_pivot.append(jugador)
                     else:
                         menores_pivot.append(jugador)
 
-    menores_pivot = quicksort(menores_pivot, flag_asc, key, key_estadisticas)
+    menores_pivot = quicksort(menores_pivot, flag_asc, llave, llave_estadisticas)
     menores_pivot.append(pivot)
 
-    mayores_pivot = quicksort(mayores_pivot, flag_asc, key, key_estadisticas)
+    mayores_pivot = quicksort(mayores_pivot, flag_asc, llave, llave_estadisticas)
     menores_pivot.extend(mayores_pivot)
 
     return menores_pivot
@@ -248,36 +301,6 @@ def mayor_al_valor_ingresado(lista_de_jugadores_original:list, llave:str, valor_
             indices_mayores_pivot.append(lista_de_jugadores.index(jugador))
 
     return indices_mayores_pivot
-
-def validar_numero(dato:str):
-    """
-    - Valida si el dato pasado es numerico, y si lo es lo convierte a int o a float.
-    - Recibe un str. 
-    - Retorna un int o float en caso de ser numerico, si no lo es retorna False.
-    """
-    patron = r"^\d+(\.\d+)?$" 
-    if re.match(patron, dato):
-        try:    
-            return int(dato)
-        except Exception as error:
-            return float(dato)
-    else: 
-        return False
-
-
-def validar_valor_ingresado(valor_ingresado):
-    """
-    - 
-    -
-    -
-    """
-    valor_ingresado = validar_numero(valor_ingresado)
-
-    while valor_ingresado == False:
-        valor_ingresado = input("Valor invalido. Ingrese un valor\n")
-        valor_ingresado = validar_numero(valor_ingresado)
-    
-    return valor_ingresado
     
 
 def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_indices:list, info:str, flag_posicion:bool=False):
@@ -301,7 +324,7 @@ def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_i
             print("Los jugadores con un mayor {} que el valor ingresado son:".format(info))
 
             for indice in range(len(lista_de_jugadores)):
-                lista_ordenada_por_posicion = quicksort(lista_de_jugadores, flag_asc=True, key="posicion")
+                lista_ordenada_por_posicion = quicksort(lista_de_jugadores, flag_asc=True, llave="posicion")
 
                 print("- {} - {}".format(lista_ordenada_por_posicion[indice]["nombre"],
                                          lista_ordenada_por_posicion[indice]["posicion"]))
@@ -362,10 +385,10 @@ def guardar_ranking_en_csv(lista_de_jugadores_original:list):
     lista_de_jugadores = lista_de_jugadores_original[:]
     ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\Archivos Dream Team\\"
 
-    lista_por_puntos = quicksort(lista_de_jugadores, flag_asc=False, key="estadisticas", key_estadisticas="puntos_totales")
-    lista_por_rebotes = quicksort(lista_de_jugadores, flag_asc=False, key="estadisticas", key_estadisticas="rebotes_totales")
-    lista_por_asistencias = quicksort(lista_de_jugadores, flag_asc=False, key="estadisticas", key_estadisticas="asistencias_totales")
-    lista_por_robos = quicksort(lista_de_jugadores, flag_asc=False, key="estadisticas", key_estadisticas="robos_totales")
+    lista_por_puntos = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="puntos_totales")
+    lista_por_rebotes = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="rebotes_totales")
+    lista_por_asistencias = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="asistencias_totales")
+    lista_por_robos = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="robos_totales")
 
     with open(ruta + "ranking_estadisticas.csv", "w") as archivo:
         archivo.write("Jugador,Puntos,Rebotes,Asistencias,Robos\n")
