@@ -228,7 +228,7 @@ def validar_numero(dato:str):
     """
     - Valida si el dato pasado es numerico, y si lo es lo convierte a int o a float.
     - Recibe un str. 
-    - Retorna un int en caso de ser numerico, si no lo es retorna False.
+    - Retorna un int o float en caso de ser numerico, si no lo es retorna False.
     """
     # CHEQUEAR ESTE PATRON (VALIDA MAL EL PUNTO)
     patron = r"[0-9]+\.?[0-9]*" # El punto escapado con ? es para que permita un punto o ninguno 
@@ -260,7 +260,7 @@ def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_i
     """
     - Imprime los nombres de los jugadores segun la lista de indice/s pasado/s.
     - Recibe la lista de jugadores, una lista de indices, un str que hace referencia a lo que se calculo anteriormente y 
-      un bool que indica si se toma la posicion en la cancha o no
+      un bool que indica si se toma la posicion en la cancha o no.
     - No retorna nada.
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
@@ -286,6 +286,47 @@ def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_i
             for indice in lista_indices:
                 print("- " + lista_de_jugadores[indice]["nombre"])
 
+
+# 17
+def jugador_mas_logros(lista_de_jugadores_original:list) -> dict:
+    """
+    - Calcula el jugador con mas logros en su carrera.
+    - Recibe la lista de jugadores.
+    - Retorna el jugador con mas logros obtenidos(dict).
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    acumulador_logros = 0
+    logros_jugadores = []
+    logros_jugadores_sin_indices = []
+
+    for jugador in lista_de_jugadores:
+        for logro in jugador["logros"]:
+            patron_cuatro_digitos = r"[0-9]{4}"
+            if re.search(patron_cuatro_digitos, logro): # Si hay un año en el logro entra.
+                acumulador_logros += len(re.findall(patron_cuatro_digitos, logro)) # Busca esos años, y el len va a indicar cuantos son y se suman al acumulador.
+            elif "Miembro" in logro:
+                acumulador_logros += 1
+            else:
+                patron = r"[0-9]{1,3}"
+                if re.match(patron, logro): # Si el logro empieza con un 1 o 2 digitos entra.
+                    acumulador_logros += int(re.findall(patron, logro)[0]) # Trae el numero de cada logro, lo parsea y lo suma al acumulador.
+        
+        logros_jugadores.append(lista_de_jugadores.index(jugador))
+        logros_jugadores.append(acumulador_logros)
+        logros_jugadores_sin_indices.append(acumulador_logros)
+
+        acumulador_logros = 0
+
+    for indice in range(len(logros_jugadores_sin_indices)):
+        if indice == 0 or float(logros_jugadores_sin_indices[maximo_indice]) < float(logros_jugadores_sin_indices[indice]):
+            maximo_indice = indice
+            numero_maximo = logros_jugadores_sin_indices[maximo_indice]
+
+    indice_jugador_mas_logros = logros_jugadores[logros_jugadores.index(numero_maximo) - 1] # Dentro del [] obtiene el indice anterior del numero_maximo, 
+                                                                                            # que seria el indice del jugador en la lista original. Al ser Jordan da 0.
+                                # Y logros_jugadores[x] te da la posicion real del json, del jugador con mas logros.
+    return lista_de_jugadores[indice_jugador_mas_logros]
 
 
 def correr_programa():
@@ -315,11 +356,11 @@ def correr_programa():
         print("14. Ver el jugador con la mayor cantidad de bloqueos totales.")
         print("15. Ingresar un valor y ver los jugadores que hayan tenido un porcentaje de tiros libres superior a ese valor.")
         print("16. Ver el promedio de puntos por partido del equipo excluyendo al jugador con la menor cantidad de puntos por partido.")
-        print("17. ")
+        print("17. Ver el jugador con la mayor cantidad de logros obtenidos.")
         print("18. Ingresar un valor y ver los jugadores que hayan tenido un porcentaje de tiros triples superior a ese valor.")
-        print("19. Ver cual es el jugador con la mayor cantidad de temporadas jugadas")
+        print("19. Ver cual es el jugador con la mayor cantidad de temporadas jugadas.")
         print("20. Ingresar un valor y ver los jugadores, ordenados por posición en la cancha, que tengan un porcentaje de tiros de campo superior a ese valor.")
-        print("23. ")
+        print("23. Ver cuál es la posición de cada jugador en cada uno de los siguientes ranking (Puntos / Rebotes / Asistencias / Robos) y guardar en archivo.")
         print("0. Salir del programa")
         
         opcion = int(input("\nIngrese la opcion deseada\n"))
@@ -437,7 +478,11 @@ def correr_programa():
                   .format(promedio_equipo_por_llave(lista_jugadores, "promedio_puntos_por_partido", excluir_menor=True)))
 
         elif opcion == 17:
-            pass # ESTE PENSARLO PARA HACER TRYHARD
+            dict_jugador = jugador_mas_logros(lista_jugadores)
+
+            print("El jugador con mas logros es {}, con los siguientes:".format(dict_jugador["nombre"]))
+            for logro in dict_jugador["logros"]:
+                print(logro)
 
         elif opcion == 18:
             valor_ingresado_18 = input("Ingrese un valor\n")
