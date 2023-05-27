@@ -10,7 +10,7 @@ def leer_archivo(nombre_archivo:str):
     lista = []
     ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\"
 
-    with open(ruta + nombre_archivo, "r") as archivo:
+    with open(ruta + nombre_archivo, "r", encoding="utf8") as archivo:
         # dict = json.load(archivo)
         # lista = dict["heroes"]
         return json.load(archivo)["jugadores"] 
@@ -174,7 +174,7 @@ def imprimir_logros_jugador(lista_de_jugadores_original:list, lista_indice_nombr
         lista_logros_del_jugador = listar_logros_jugador(lista_de_jugadores, indice_jugador)
         
         if salon_de_la_fama == False:
-            print("Logros de {}:".format(lista_de_jugadores[indice_jugador]["nombre"]))
+            print("- Logros de {}:".format(lista_de_jugadores[indice_jugador]["nombre"]))
 
             for logro in lista_logros_del_jugador:
                 print("{}".format(logro))
@@ -311,6 +311,7 @@ def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_i
     - No retorna nada.
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
+    lista_jugadores_mayores_a_valor = []
 
     if len(lista_indices) == 0:
         print("No hay ningun jugador que promedie mas {}".format(info))
@@ -323,8 +324,11 @@ def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_i
         elif flag_posicion == True:
             print("Los jugadores con un mayor {} que el valor ingresado son:".format(info))
 
-            for indice in range(len(lista_de_jugadores)):
-                lista_ordenada_por_posicion = quicksort(lista_de_jugadores, flag_asc=True, llave="posicion")
+            for indice in lista_indices:
+                lista_jugadores_mayores_a_valor.append(lista_de_jugadores[indice]) # Agregamos a una nueva lista, los jugadores que sean mayores al valor ingresado.
+
+            for indice in range(len(lista_jugadores_mayores_a_valor)):  # Ordena los mayores al valor por posicion.  
+                lista_ordenada_por_posicion = quicksort(lista_jugadores_mayores_a_valor, flag_asc=True, llave="posicion")
 
                 print("- {} - {}".format(lista_ordenada_por_posicion[indice]["nombre"],
                                          lista_ordenada_por_posicion[indice]["posicion"]))

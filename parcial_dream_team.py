@@ -1,5 +1,4 @@
 from funciones_dream_team import *
-import re
 
 
 def correr_programa():
@@ -72,7 +71,7 @@ def correr_programa():
         elif opcion == "4":
             nombre_jugador = input("Ingrese el nombre del jugador cuyos logros quiere ver\n")
 
-            lista_indice_nombres_elegidos = validacion_nombre(lista_jugadores, nombre_jugador) # MIRAR FUNCION DE VALIDAR NOMBRE
+            lista_indice_nombres_elegidos = validacion_nombre(lista_jugadores, nombre_jugador) 
 
             lista_indice_nombres_elegidos = validar_dato_ingresado(lista_jugadores, lista_indice_nombres_elegidos)
 
@@ -97,7 +96,7 @@ def correr_programa():
         elif opcion == "7":
             print("El jugador con mayor cantidad de rebotes es {} rebotes".format(calcular_max(lista_jugadores, llave="rebotes_totales")))
 
-        elif opcion == 8:
+        elif opcion == "8":
             print("El jugador con mayor porcentaje de tiros de campo es {} %".format(calcular_max(lista_jugadores, llave="porcentaje_tiros_de_campo")))
 
         elif opcion == "9":
@@ -149,8 +148,8 @@ def correr_programa():
             print("El jugador con mayor cantidad de temporadas jugadas es {} temporadas".format(calcular_max(lista_jugadores, llave="temporadas")))
 
         elif opcion == "20":
-            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="porcentaje_tiros_de_campo")
-            
+            lista_indices_mayores = ingresar_y_validar_valor(lista_jugadores, llave="porcentaje_tiros_de_campo")            
+
             imprimir_nombre_jugador_por_indice(lista_jugadores, lista_indices_mayores, info="porcentaje de tiros de campo", flag_posicion=True)
 
         elif opcion == "23":
