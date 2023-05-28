@@ -36,7 +36,7 @@ def correr_programa():
         
         opcion = input("\nIngrese la opcion deseada\n")
     
-        while validacion_menu(opcion) == False:
+        while validar_menu(opcion) == False:
             opcion = input("Opcion invalida. Ingrese la opcion deseada\n")
 
         if opcion == "1": 

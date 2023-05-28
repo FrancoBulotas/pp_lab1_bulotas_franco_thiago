@@ -8,9 +8,9 @@ def leer_archivo(nombre_archivo:str):
     - Retorna la lista de heroes
     """
     lista = []
-    ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\"
+    # ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\"
 
-    with open(ruta + nombre_archivo, "r", encoding="utf8") as archivo:
+    with open(nombre_archivo, "r", encoding="utf8") as archivo:
         # dict = json.load(archivo)
         # lista = dict["heroes"]
         return json.load(archivo)["jugadores"] 
@@ -20,14 +20,14 @@ def leer_archivo(nombre_archivo:str):
 lista_jugadores = leer_archivo("dream_team.json")
 
 
-def validacion_menu(numero:int) -> bool:
+def validar_menu(numero:int) -> bool:
     """
     - Esta función busca validar el numero ingresado para que sea apto para el menú.(1-20,23)
     - Un numero que se evaluará la validación.
     - True en caso que haya coincidido el re.match , False en caso que no haya coincidido.
     """
-    validacion = re.match(r'[1]?[0-9]{1}$|20|23', numero)
-    if validacion:
+    coincidencia = re.match(r'^1?\d{1}$|20|23', numero)
+    if coincidencia:
         return True
     else:
         return False
@@ -90,9 +90,10 @@ def validar_dato_ingresado(lista_de_jugadores_original:list, valor_ingresado):
     
     return valor_ingresado
 
+
 def ingresar_y_validar_valor(lista_de_jugadores_original:list, llave:str):
     """
-    - Valida el valor ingresado e imprime los nombres que cumplan lo dado.
+    - Pide ingresar un valor, lo valida y calcula los mayores a ese valor ingresado.
     - Recibe la lista de jugadores y una llave(str).
     - Retorna la lista de los mayores al valor dado.
     """
@@ -108,9 +109,9 @@ def ingresar_y_validar_valor(lista_de_jugadores_original:list, llave:str):
 # 1
 def mostrar_jugadores(lista_de_jugadores_original:list):
     """
-    - Muestra la lista de jugadores del Dream Team
-    - Recibe la lista de jugadores
-    - No retorna nada
+    - Muestra la lista de jugadores del Dream Team.
+    - Recibe la lista de jugadores.
+    - No retorna nada.
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
     cont = 1
@@ -137,11 +138,11 @@ def guardar_estadisticas_csv(lista_de_jugadores_original:list, indice:int):
     - Recibe la lista de jugadores y el indice elegido anteriormente.
     - No retorna nada.
     """
-    ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\Archivos Dream Team\\"
+    # ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\Archivos Dream Team\\"
 
     lista_de_jugadores = lista_de_jugadores_original[:]
 
-    with open(ruta + lista_de_jugadores[indice]["nombre"] + ".csv", "w") as archivo:
+    with open(lista_de_jugadores[indice]["nombre"] + ".csv", "w") as archivo:
         for estadistica in lista_de_jugadores[indice]["estadisticas"]:         
             archivo.write("{},".format(estadistica))
 
@@ -166,7 +167,7 @@ def imprimir_logros_jugador(lista_de_jugadores_original:list, lista_indice_nombr
     """
     - Imprime los logros de los jugadores por nombre dado, o indica si estan en el salon de la fama.
     - Recibe la lista de jugadores, la lista de indices de nombres elegidos y un bool indicando si se quiere saber si ingreso al salon de la fama o no.
-    - No retorna nada
+    - No retorna nada.
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
 
@@ -184,11 +185,11 @@ def imprimir_logros_jugador(lista_de_jugadores_original:list, lista_indice_nombr
 
 
 # 5
-def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str, excluir_menor=False) -> int: 
+def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str, excluir_menor:bool=False) -> int: 
     """
     - Se encarga de hallar el promedio del equipo de la llave dada.
     - Recibe una lista de jugadores y una llave del dict estadisticas.
-    - Retorna el promedio (int)
+    - Retorna el promedio (int).
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
     acumulador = 0
@@ -201,9 +202,7 @@ def promedio_equipo_por_llave(lista_de_jugadores_original:list, llave:str, exclu
         if type(jugador["estadisticas"][llave]) == type(int()) or type(jugador["estadisticas"][llave]) == type(float()):
             acumulador += jugador["estadisticas"][llave]
             contador += 1
-
-    
-
+            
     return acumulador / contador
 
 
@@ -353,23 +352,23 @@ def jugador_mas_logros(lista_de_jugadores_original:list) -> dict:
 
     for jugador in lista_de_jugadores:
         for logro in jugador["logros"]:
-            patron_cuatro_digitos = r"[0-9]{4}"
+            patron_cuatro_digitos = r"\d{4}"
             if re.search(patron_cuatro_digitos, logro): # Si hay un año en el logro entra.
                 acumulador_logros += len(re.findall(patron_cuatro_digitos, logro)) # Busca esos años, y el len va a indicar cuantos son y se suman al acumulador.
             elif "Miembro" in logro:
                 acumulador_logros += 1
             else:
-                patron = r"[0-9]{1,3}"
+                patron = r"\d{1,3}"
                 if re.match(patron, logro): # Si el logro empieza con un 1 o 2 digitos entra.
                     acumulador_logros += int(re.findall(patron, logro)[0]) # Trae el numero de cada logro, lo parsea y lo suma al acumulador.
         
-        logros_jugadores.append(lista_de_jugadores.index(jugador))
-        logros_jugadores.append(acumulador_logros)
-        logros_jugadores_sin_indices.append(acumulador_logros)
+        logros_jugadores.append(lista_de_jugadores.index(jugador)) # Agrego el indice del jugador de la lista real.
+        logros_jugadores.append(acumulador_logros) # Agrego la cantidad de logros que tenga ese jugadoor. 
+        logros_jugadores_sin_indices.append(acumulador_logros) # Lista aparte solo con logros.
 
         acumulador_logros = 0
 
-    for indice in range(len(logros_jugadores_sin_indices)):
+    for indice in range(len(logros_jugadores_sin_indices)): # Recorro segun el largo de la lista de solo logros.
         if indice == 0 or float(logros_jugadores_sin_indices[maximo_indice]) < float(logros_jugadores_sin_indices[indice]):
             maximo_indice = indice
             numero_maximo = logros_jugadores_sin_indices[maximo_indice]
@@ -387,14 +386,14 @@ def guardar_ranking_en_csv(lista_de_jugadores_original:list):
     - No retorna nada.
     """
     lista_de_jugadores = lista_de_jugadores_original[:]
-    ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\Archivos Dream Team\\"
+    # ruta = "C:\\Users\\Franco\\Desktop\\UTN FRA\\Tecnicatura Superior en Programacion\\1er Cuatrimestre\\Laboratorio I\\Primer Parcial Repo\\Archivos Dream Team\\"
 
     lista_por_puntos = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="puntos_totales")
     lista_por_rebotes = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="rebotes_totales")
     lista_por_asistencias = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="asistencias_totales")
     lista_por_robos = quicksort(lista_de_jugadores, flag_asc=False, llave="estadisticas", llave_estadisticas="robos_totales")
 
-    with open(ruta + "ranking_estadisticas.csv", "w") as archivo:
+    with open("ranking_estadisticas.csv", "w") as archivo:
         archivo.write("Jugador,Puntos,Rebotes,Asistencias,Robos\n")
         
         for jugador in lista_de_jugadores:
