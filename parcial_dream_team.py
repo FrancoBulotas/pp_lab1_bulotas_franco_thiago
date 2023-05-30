@@ -57,7 +57,7 @@ def correr_programa():
 
             print(lista_jugadores[indice_elegido]["nombre"])
             for estadistica in estadistica_jugador:
-                print("{}: {}".format(estadistica, estadistica_jugador[estadistica]))
+                print("{}: {}".format(estadistica.replace("_"," "), estadistica_jugador[estadistica]))
 
             flag_segundo_punto = True
 
