@@ -32,6 +32,10 @@ def correr_programa():
         print("19. Ver cual es el jugador con la mayor cantidad de temporadas jugadas.")
         print("20. Ingresar un valor y ver los jugadores, ordenados por posición en la cancha, que tengan un porcentaje de tiros de campo superior a ese valor.")
         print("23. Ver cuál es la posición de cada jugador en cada uno de los siguientes ranking (Puntos / Rebotes / Asistencias / Robos) y guardar en archivo.")
+        print("24 (1 extra). Determinar jugadores en cada posicion.")
+        print("25 (2 extra). Ver jugadores ordenados por cantidad de  All-Star (descendente).")
+        print("26 (3 extra). Ver que jugador tiene las mejores estadisticas en cada valor.")
+        print("27 (4 extra). Ver que jugador tiene las mejores estadisticas de todos.")
         print("0. Salir del programa")
         
         opcion = input("\nIngrese la opcion deseada\n")
@@ -156,7 +160,23 @@ def correr_programa():
             guardar_ranking_en_csv(lista_jugadores)
 
             print("Archivo guardado!!")
+        elif opcion == "24":
+            jugadores_por_posicion(lista_jugadores)
 
+        elif opcion == "25":
+            all_star_por_jugador(lista_jugadores)
+            
+        elif opcion == "26":
+            lista_maximos = mayor_estadisticas_por_valor(lista_jugadores)
+
+            indice = 0
+            for estadistica in lista_jugadores[0]["estadisticas"]:
+                print("Mayor cantidad de {}: {}".format(estadistica.replace("_"," "), lista_maximos[indice])) 
+                indice += 1 
+
+        elif opcion == "27":
+            jugador_mejores_estadisticas(lista_jugadores)
+        
         elif opcion == "0":
             break
 

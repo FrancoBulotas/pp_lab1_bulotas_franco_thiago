@@ -26,7 +26,7 @@ def validar_menu(numero:int) -> bool:
     - Un numero que se evaluará la validación.
     - True en caso que haya coincidido el re.match , False en caso que no haya coincidido.
     """
-    coincidencia = re.match(r'^1?\d{1}$|20|23', numero)
+    coincidencia = re.match(r'^1?\d{1}$|20|23|24|25|26|27', numero)
     if coincidencia:
         return True
     else:
@@ -336,7 +336,6 @@ def imprimir_nombre_jugador_por_indice(lista_de_jugadores_original:list, lista_i
             for indice in lista_indices:
                 print("- " + lista_de_jugadores[indice]["nombre"])
 
-
 # 17
 def jugador_mas_logros(lista_de_jugadores_original:list) -> dict:
     """
@@ -416,3 +415,111 @@ def guardar_ranking_en_csv(lista_de_jugadores_original:list):
             mensaje = "{},{},{},{},{}\n".format(jugador["nombre"], indice_por_puntos + 1, indice_por_rebotes + 1, indice_por_asistencias + 1, indice_por_robos + 1)
 
             archivo.write(mensaje)
+
+
+# 1 extra
+def jugadores_por_posicion(lista_de_jugadores_original:list):
+    """
+    - Averigua la cantidad de jugadores por posicion en la cancha.
+    - Recibe la lista de heroes.
+    - No retorna nada.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+
+    cont_ala_pivot = 0
+    cont_alero = 0
+    cont_base = 0
+    cont_escolta = 0
+    cont_pivot = 0
+
+    for jugador in lista_de_jugadores:
+        if jugador["posicion"].lower() == "ala-pivot":
+            cont_ala_pivot += 1
+        if jugador["posicion"].lower() == "alero":
+            cont_alero += 1
+        if jugador["posicion"].lower() == "base":
+            cont_base += 1
+        if jugador["posicion"].lower() == "escolta":
+            cont_escolta+= 1        
+        if jugador["posicion"].lower() == "pivot":
+            cont_pivot += 1
+        
+    print("Ala-pivot: {}\nAlero: {}\nBase: {}\nEscolta: {}\nPivot: {}\n".format(cont_ala_pivot, cont_alero, cont_base, cont_escolta, cont_pivot))
+
+# 2 extra
+def all_star_por_jugador(lista_de_jugadores_original:list) -> list:
+    """
+    - Imprime cuantos all-star tiene cada jugador de manera descendente.
+    - Recibe la lista de jugadores.
+    - Retorna la lista con los jugadores que formaron parte del all-star.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+    lista_all_stars = []
+
+    for jugador in lista_de_jugadores:
+        dict = {}
+        cantidad_all_star = 0
+        for logro in jugador["logros"]:
+            existe = re.findall(r"(\d{1,3}) veces All-Star", logro)
+            if existe:
+                cantidad_all_star = int(existe[0])
+
+        dict["nombre"] = jugador["nombre"]
+        dict["cantidad_all_star"] = cantidad_all_star
+        lista_all_stars.append(dict)
+    
+    lista_all_stars = quicksort(lista_all_stars, flag_asc=False, llave="cantidad_all_star")
+    for jugador in lista_all_stars:
+        print("{0} ({1} veces All-Star)".format(jugador["nombre"], jugador["cantidad_all_star"]))
+
+# 3 extra
+def mayor_estadisticas_por_valor(lista_de_jugadores_original:list) -> list:
+    """
+    - Devuelve la lista de jugadores con mejores estadisticas en cada valor.
+    - Recibe la lista de jugadores.
+    - Retorna la lista de jugadores con el maximo en cada estadistica.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+    lista_maximos = []
+
+    for estadistica in lista_de_jugadores[0]["estadisticas"]:
+        lista_maximos.append(calcular_max(lista_de_jugadores, estadistica))
+
+    return lista_maximos
+
+# 4 extra
+def jugador_mejores_estadisticas(lista_de_jugadores_original:list):
+    """
+    - Determina cual es el jugador con mejores estadisticas de todos.
+    - Recibe la lista de jugadores.
+    - No retorna nada.
+    """
+    lista_de_jugadores = lista_de_jugadores_original[:]
+    lista_nombres_maximos = []
+
+    for jugador in lista_de_jugadores:
+        for maximo in mayor_estadisticas_por_valor(lista_de_jugadores):
+            lista_maximo = re.split(" - ", maximo)
+
+            if lista_maximo[0] == jugador["nombre"]:
+                lista_nombres_maximos.append(jugador["nombre"])
+
+    lista_nombres_y_cont = []
+    lista_de_listas = []
+
+    for jugador in lista_de_jugadores:
+        contador_por_nombre = lista_nombres_maximos.count(jugador["nombre"])
+        lista_nombres_y_cont.append(jugador["nombre"])
+        lista_nombres_y_cont.append(contador_por_nombre)
+        lista_de_listas.append(lista_nombres_y_cont)
+        lista_nombres_y_cont = []
+        
+    for indice in range(len(lista_de_listas)):
+            if indice == 0 or float(lista_de_listas[maximo_indice][1]) < float(lista_de_listas[indice][1]):
+                maximo_indice = indice
+                nombre_maximo = lista_de_listas[indice][0]
+
+    print("El nombre del jugador con mejores estadisticas de todos es: {}".format(nombre_maximo))
+
+jugador_mejores_estadisticas(lista_jugadores)
+            
